@@ -1,0 +1,14 @@
+# Dependências instaladas localmente (serão reinstaladas no container)
+node_modules/
+
+# Build anterior
+dist/
+
+# IDE e sistema
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs e temporários
+*.log
+npm-debug.log*

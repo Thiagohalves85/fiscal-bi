@@ -1,0 +1,15 @@
+# Diretório de build do Maven
+target/
+
+# IDE e sistema
+.idea/
+.vscode/
+*.iml
+*.class
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
