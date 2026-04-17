@@ -88,4 +88,3 @@ public class NotaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Nota não encontrada com id: " + id));
     }
 }
-

@@ -1,8 +1,6 @@
 package com.bi.fiscalbi.mapper;
 
 import com.bi.fiscalbi.domain.dto.request.NotaRequest;
-import com.bi.fiscalbi.domain.dto.request.ItemNotaRequest;
-import com.bi.fiscalbi.domain.dto.request.ParcNotaRequest;
 import com.bi.fiscalbi.domain.dto.response.NotaResponse;
 import com.bi.fiscalbi.domain.dto.response.ItemNotaResponse;
 import com.bi.fiscalbi.domain.dto.response.ParcNotaResponse;
@@ -29,7 +27,8 @@ public class NotaMapper {
     public Nota toEntity(NotaRequest request) {
         Nota nota = new Nota();
         nota.setCliente(clienteRepository.findById(request.getCodCliente())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com id: " + request.getCodCliente())));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cliente não encontrado com id: " + request.getCodCliente())));
         nota.setDataEmissao(request.getDataEmissao());
         nota.setValorTotal(request.getValorTotal());
 
@@ -56,17 +55,13 @@ public class NotaMapper {
     }
 
     public NotaResponse toResponse(Nota nota) {
-        List<ItemNotaResponse> itens = nota.getItens().stream().map(i ->
-                new ItemNotaResponse(i.getCodItemNota(), i.getValorUnitario(), i.getQuantidade())
-        ).toList();
+        List<ItemNotaResponse> itens = nota.getItens().stream()
+                .map(i -> new ItemNotaResponse(i.getCodItemNota(), i.getValorUnitario(), i.getQuantidade())).toList();
 
-        List<ParcNotaResponse> parcelas = nota.getParcelas().stream().map(p ->
-                new ParcNotaResponse(
-                        p.getCodParcNota(), p.getNumero(),
-                        p.getValorVencimento(), p.getDataVencimento(),
-                        p.getValorRecebimento(), p.getDataRecebimento()
-                )
-        ).toList();
+        List<ParcNotaResponse> parcelas = nota.getParcelas().stream().map(p -> new ParcNotaResponse(
+                p.getCodParcNota(), p.getNumero(),
+                p.getValorVencimento(), p.getDataVencimento(),
+                p.getValorRecebimento(), p.getDataRecebimento())).toList();
 
         return new NotaResponse(
                 nota.getCodNota(),
@@ -74,7 +69,6 @@ public class NotaMapper {
                 nota.getDataEmissao(),
                 nota.getValorTotal(),
                 itens,
-                parcelas
-        );
+                parcelas);
     }
 }

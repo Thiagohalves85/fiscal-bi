@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,7 +27,6 @@ public class NotaControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
     private NotaService notaService;
 
     @Autowired
@@ -54,9 +52,8 @@ public class NotaControllerTest {
         request.setParcelas(java.util.List.of(parc));
 
         NotaResponse response = new NotaResponse(
-            1L, null, LocalDate.now(), new BigDecimal("100.00"), 
-            Collections.emptyList(), Collections.emptyList()
-        );
+                1L, null, LocalDate.now(), new BigDecimal("100.00"),
+                Collections.emptyList(), Collections.emptyList());
 
         when(notaService.salvar(any(NotaRequest.class))).thenReturn(response);
 
@@ -73,9 +70,8 @@ public class NotaControllerTest {
     void buscar_DeveRetornarOk_QuandoNotaExistir() throws Exception {
         // Arrange
         NotaResponse response = new NotaResponse(
-            1L, null, LocalDate.now(), new BigDecimal("500.00"), 
-            Collections.emptyList(), Collections.emptyList()
-        );
+                1L, null, LocalDate.now(), new BigDecimal("500.00"),
+                Collections.emptyList(), Collections.emptyList());
 
         when(notaService.buscarPorId(1L)).thenReturn(response);
 

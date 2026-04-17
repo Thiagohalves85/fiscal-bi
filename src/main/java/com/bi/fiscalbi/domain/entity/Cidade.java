@@ -1,6 +1,8 @@
 package com.bi.fiscalbi.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "cidades")
@@ -10,12 +12,12 @@ public class Cidade {
     @Column(name = "codCidade")
     private Long codCidade;
 
-    @jakarta.validation.constraints.NotBlank(message = "O nome da cidade é obrigatório")
+    @NotBlank(message = "O nome da cidade é obrigatório")
     @Column(nullable = false)
     private String nome;
 
-    @jakarta.validation.constraints.NotBlank(message = "A UF da cidade é obrigatória")
-    @jakarta.validation.constraints.Size(min = 2, max = 2, message = "A UF deve ter 2 caracteres")
+    @NotBlank(message = "A UF da cidade é obrigatória")
+    @Size(min = 2, max = 2, message = "A UF deve ter 2 caracteres")
     @Column(nullable = false, length = 2)
     private String uf;
 
