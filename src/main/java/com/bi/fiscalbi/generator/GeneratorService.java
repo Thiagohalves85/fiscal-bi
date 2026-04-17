@@ -1,8 +1,10 @@
 package com.bi.fiscalbi.generator;
 
 import com.bi.fiscalbi.domain.entity.Cliente;
+import com.bi.fiscalbi.domain.entity.Cidade;
 import com.bi.fiscalbi.domain.entity.Nota;
 import com.bi.fiscalbi.repository.ClienteRepository;
+import com.bi.fiscalbi.repository.CidadeRepository;
 import com.bi.fiscalbi.repository.NotaRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,6 +22,7 @@ import com.bi.fiscalbi.exception.ResourceNotFoundException;
 public class GeneratorService {
     private final NotaRepository notaRepository;
     private final ClienteRepository clienteRepository;
+    private final CidadeRepository cidadeRepository;
     private final NotaFactory notaFactory;
 
     private static final int BATCH_SIZE = 1000;
@@ -29,9 +32,11 @@ public class GeneratorService {
 
     public GeneratorService(NotaRepository notaRepository,
             ClienteRepository clienteRepository,
+            CidadeRepository cidadeRepository,
             NotaFactory notaFactory) {
         this.notaRepository = notaRepository;
         this.clienteRepository = clienteRepository;
+        this.cidadeRepository = cidadeRepository;
         this.notaFactory = notaFactory;
     }
 
@@ -65,7 +70,8 @@ public class GeneratorService {
         }
 
         if (clientes.isEmpty()) {
-            throw new ResourceNotFoundException("Nenhum cliente cadastrado para gerar notas");
+            gerarDadosMestresIniciais();
+            clientes = clienteRepository.findAll();
         }
 
         for (int i = 0; i < totalNotas; i += BATCH_SIZE) {
@@ -93,6 +99,19 @@ public class GeneratorService {
         }
 
         return notas;
+    }
+
+    private synchronized void gerarDadosMestresIniciais() {
+        if (clienteRepository.count() > 0)
+            return;
+
+        List<Cidade> novasCidades = notaFactory.gerarCidades(5);
+        cidadeRepository.saveAll(novasCidades);
+
+        List<Cliente> novosClientes = notaFactory.gerarClientes(20, novasCidades);
+        clienteRepository.saveAll(novosClientes);
+
+        flushAndClear();
     }
 
     private void flushAndClear() {

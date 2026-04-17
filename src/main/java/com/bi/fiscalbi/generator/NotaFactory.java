@@ -112,6 +112,46 @@ public class NotaFactory {
         return BigDecimal.valueOf(valor).setScale(2, RoundingMode.HALF_UP);
     }
 
+    private static final String[] UFS_REAIS = { "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS",
+            "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" };
+    private static final String[] PREFIXOS_EMPRESA = { "Comercial", "Varejo", "Indústria", "Distribuidora", "Serviços",
+            "Tech", "Logística" };
+    private static final String[] SUFIXOS_EMPRESA = { "Silva", "Santos", "Oliveira", "Souza", "Rodrigues", "Ferreira",
+            "Alves", "Global", "Express", "Brasil" };
+    private static final String[] PREFIXOS_CIDADE = { "Nova", "São", "Santa", "Vila", "Bom", "Bela", "Porto", "Rio" };
+    private static final String[] SUFIXOS_CIDADE = { "Esperança", "Vista", "Cruz", "José", "Claro", "Alegre", "Verde",
+            "Sul" };
+
+    public List<Cidade> gerarCidades(int quantidade) {
+        List<Cidade> cidades = new ArrayList<>();
+        for (int i = 0; i < quantidade; i++) {
+            Cidade cidade = new Cidade();
+            String nomeCidade = PREFIXOS_CIDADE[random.nextInt(PREFIXOS_CIDADE.length)] + " " +
+                    SUFIXOS_CIDADE[random.nextInt(SUFIXOS_CIDADE.length)] + " " + i;
+            String uf = UFS_REAIS[random.nextInt(UFS_REAIS.length)];
+
+            cidade.setNome(nomeCidade);
+            cidade.setUf(uf);
+            cidades.add(cidade);
+        }
+        return cidades;
+    }
+
+    public List<Cliente> gerarClientes(int quantidade, List<Cidade> cidades) {
+        List<Cliente> clientes = new ArrayList<>();
+        for (int i = 0; i < quantidade; i++) {
+            Cliente cliente = new Cliente();
+            String nomeEmpresa = PREFIXOS_EMPRESA[random.nextInt(PREFIXOS_EMPRESA.length)] + " " +
+                    SUFIXOS_EMPRESA[random.nextInt(SUFIXOS_EMPRESA.length)] + " LTDA " + i;
+            Cidade cidadeAleatoria = cidades.get(random.nextInt(cidades.size()));
+
+            cliente.setNome(nomeEmpresa);
+            cliente.setCidade(cidadeAleatoria);
+            clientes.add(cliente);
+        }
+        return clientes;
+    }
+
     private LocalDate gerarData() {
         return LocalDate.now().minusDays(random.nextInt(365));
     }
