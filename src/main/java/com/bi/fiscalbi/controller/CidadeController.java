@@ -36,7 +36,7 @@ public class CidadeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CidadeResponse> atualizar(@PathVariable @NonNull Long id,
-                                                     @RequestBody @Valid CidadeRequest request) {
+            @RequestBody @Valid CidadeRequest request) {
         return ResponseEntity.ok(service.atualizar(id, request));
     }
 
@@ -46,4 +46,3 @@ public class CidadeController {
         return ResponseEntity.noContent().build();
     }
 }
-

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 @Component
-public class NotaFactory {
+public class GeneratorFactory {
     private final Random random = new Random();
 
     public Nota criarNota(Cliente cliente) {
