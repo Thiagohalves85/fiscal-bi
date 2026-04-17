@@ -23,7 +23,7 @@ public class GeneratorService {
     private final NotaRepository notaRepository;
     private final ClienteRepository clienteRepository;
     private final CidadeRepository cidadeRepository;
-    private final NotaFactory notaFactory;
+    private final GeneratorFactory generatorFactory;
 
     private static final int BATCH_SIZE = 1000;
 
@@ -33,11 +33,11 @@ public class GeneratorService {
     public GeneratorService(NotaRepository notaRepository,
             ClienteRepository clienteRepository,
             CidadeRepository cidadeRepository,
-            NotaFactory notaFactory) {
+            GeneratorFactory generatorFactory) {
         this.notaRepository = notaRepository;
         this.clienteRepository = clienteRepository;
         this.cidadeRepository = cidadeRepository;
-        this.notaFactory = notaFactory;
+        this.generatorFactory = generatorFactory;
     }
 
     public void gerarParalelo(int totalNotas, Long codCliente) {
@@ -93,7 +93,7 @@ public class GeneratorService {
 
             Cliente cliente = clientes.get(random.nextInt(clientes.size()));
 
-            Nota nota = notaFactory.criarNota(cliente);
+            Nota nota = generatorFactory.criarNota(cliente);
 
             notas.add(nota);
         }
@@ -105,10 +105,10 @@ public class GeneratorService {
         if (clienteRepository.count() > 0)
             return;
 
-        List<Cidade> novasCidades = notaFactory.gerarCidades(5);
+        List<Cidade> novasCidades = generatorFactory.gerarCidades(5);
         cidadeRepository.saveAll(novasCidades);
 
-        List<Cliente> novosClientes = notaFactory.gerarClientes(20, novasCidades);
+        List<Cliente> novosClientes = generatorFactory.gerarClientes(20, novasCidades);
         clienteRepository.saveAll(novosClientes);
 
         flushAndClear();

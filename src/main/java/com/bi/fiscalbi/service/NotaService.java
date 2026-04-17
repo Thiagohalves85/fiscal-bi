@@ -7,13 +7,15 @@ import com.bi.fiscalbi.exception.BusinessException;
 import com.bi.fiscalbi.exception.ResourceNotFoundException;
 import com.bi.fiscalbi.mapper.NotaMapper;
 import com.bi.fiscalbi.repository.NotaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Map;
 
 @Service
 public class NotaService {
@@ -38,29 +40,31 @@ public class NotaService {
     }
 
     @Transactional(readOnly = true)
-    public List<NotaResponse> listar() {
-        return notaRepository.findAll().stream()
-                .map(notaMapper::toResponse)
-                .toList();
+    public Page<NotaResponse> listar(Pageable pageable, String search) {
+        Page<Nota> page;
+        if (search != null && !search.isBlank()) {
+            page = notaRepository.findBySearch(search, pageable);
+        } else {
+            page = notaRepository.findAll(pageable);
+        }
+        return page.map(notaMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NotaResponse> listarPorCliente(@NonNull Long codCliente, Pageable pageable) {
+        return notaRepository.findByClienteCodCliente(codCliente, pageable)
+                .map(notaMapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NotaResponse> listarPorCidade(@NonNull Long codCidade, Pageable pageable) {
+        return notaRepository.findByClienteCidadeCodCidade(codCidade, pageable)
+                .map(notaMapper::toResponse);
     }
 
     public void deletar(@NonNull Long id) {
         findOrThrow(id);
         notaRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<NotaResponse> listarPorCliente(@NonNull Long codCliente) {
-        return notaRepository.findByClienteCodCliente(codCliente).stream()
-                .map(notaMapper::toResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<NotaResponse> listarPorCidade(@NonNull Long codCidade) {
-        return notaRepository.findByClienteCidadeCodCidade(codCidade).stream()
-                .map(notaMapper::toResponse)
-                .toList();
     }
 
     private void validarNota(Nota nota) {
@@ -81,6 +85,14 @@ public class NotaService {
         if (totalParcelas.compareTo(nota.getValorTotal()) != 0) {
             throw new BusinessException("Total das parcelas difere do valor da nota");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getEstatisticas() {
+        return Map.of(
+                "totalNotas", notaRepository.count(),
+                "valorTotal", notaRepository.sumValorTotal(),
+                "valorRecebido", notaRepository.sumValorRecebido());
     }
 
     private Nota findOrThrow(Long id) {

@@ -1,60 +1,73 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getCidades } from '../api/services'
-import { getClientes } from '../api/services'
-import { getNotas } from '../api/services'
+import { getCidades, getClientes, getNotas, getNotaStats } from '../api/services'
 import { Loading } from '../components/UI'
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(null)
+  const [stats, setStats] = useState({
+    cidades: 0,
+    clientes: 0,
+    notas: 0,
+    valorEmitido: 0,
+    valorRecebido: 0,
+  })
   const [loading, setLoading] = useState(true)
   const [recentNotas, setRecentNotas] = useState([])
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    async function load() {
+    async function loadData() {
       try {
-        const [cidades, clientes, notas] = await Promise.all([
+        const [cidades, clientes, notaStats, recent] = await Promise.all([
           getCidades(),
           getClientes(),
-          getNotas(),
+          getNotaStats(),
+          getNotas({ size: 8, sort: 'codNota,desc' }), // Busca apenas as 8 mais recentes
         ])
-
-        const totalNotas = notas.length
-        const totalValor = notas.reduce((s, n) => s + (n.valorTotal || 0), 0)
-        const totalRecebido = notas.reduce((s, n) => {
-          const parcs = n.parcelas || []
-          return s + parcs.reduce((ps, p) => ps + (p.valorRecebimento || 0), 0)
-        }, 0)
 
         setStats({
           cidades: cidades.length,
           clientes: clientes.length,
-          notas: totalNotas,
-          valorEmitido: totalValor,
-          valorRecebido: totalRecebido,
+          notas: notaStats.totalNotas,
+          valorEmitido: notaStats.valorTotal,
+          valorRecebido: notaStats.valorRecebido,
         })
 
-        // Recent: last 8 notas
-        const sorted = [...notas].sort(
-          (a, b) => new Date(b.dataEmissao) - new Date(a.dataEmissao)
-        )
-        setRecentNotas(sorted.slice(0, 8))
-      } catch (_) {
-        setStats({ cidades: 0, clientes: 0, notas: 0, valorEmitido: 0, valorRecebido: 0 })
+        setRecentNotas(recent.content || []) // O backend agora retorna Page, usamos .content
+      } catch (err) {
+        console.error("Erro ao carregar dashboard:", err)
+        setError("Não foi possível carregar os dados do dashboard.")
       } finally {
         setLoading(false)
       }
     }
-    load()
+    loadData()
   }, [])
 
   const fmt = (v) =>
     v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
   const fmtDate = (d) =>
-    d ? new Date(d + 'T00:00:00').toLocaleDateString('pt-BR') : '—'
+    d ? new Date(d + 'T00:00:00').toLocaleDateString('pt-BR') : '—' // Adicionado 'T00:00:00' para garantir que a data seja interpretada no fuso horário local
 
   if (loading) return <Loading text="Carregando dashboard..." />
+
+  if (error) {
+    return (
+      <div className="page">
+        <div className="empty-state" style={{ padding: '32px 0' }}>
+          <span className="empty-icon" style={{ fontSize: '2rem' }}>⚠️</span>
+          <span className="empty-title">Erro ao carregar dados</span>
+          <p className="empty-desc" style={{ maxWidth: 300 }}>
+            {error}
+          </p>
+          <button className="btn btn-primary" onClick={() => window.location.reload()}>
+            Recarregar Página
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="page">
@@ -115,10 +128,10 @@ export default function Dashboard() {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <QuickLink to="/cidades"  icon="🏙" title="Gerenciar Cidades"   desc="Cadastrar e editar cidades" />
-            <QuickLink to="/clientes" icon="🏢" title="Gerenciar Clientes"  desc="Cadastrar e editar clientes" />
-            <QuickLink to="/notas"    icon="📄" title="Notas Fiscais"       desc="Consultar e criar notas" />
-            <QuickLink to="/gerador"  icon="⚡" title="Gerador BI"          desc="Gerar dados sintéticos em massa" />
+            <QuickLink to="/cidades" icon="🏙" title="Gerenciar Cidades" desc="Cadastrar e editar cidades" />
+            <QuickLink to="/clientes" icon="🏢" title="Gerenciar Clientes" desc="Cadastrar e editar clientes" />
+            <QuickLink to="/notas" icon="📄" title="Notas Fiscais" desc="Consultar e criar notas" />
+            <QuickLink to="/gerador" icon="⚡" title="Gerador BI" desc="Gerar dados sintéticos em massa" />
           </div>
         </div>
 

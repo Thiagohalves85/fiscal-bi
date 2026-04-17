@@ -4,11 +4,15 @@ import com.bi.fiscalbi.domain.dto.request.NotaRequest;
 import com.bi.fiscalbi.domain.dto.response.NotaResponse;
 import com.bi.fiscalbi.service.NotaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notas")
@@ -30,17 +34,24 @@ public class NotaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NotaResponse>> listar(
+    public ResponseEntity<Page<NotaResponse>> listar(
             @RequestParam(required = false) Long codCliente,
-            @RequestParam(required = false) Long codCidade) {
+            @RequestParam(required = false) Long codCidade,
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 20, sort = "codNota", direction = Sort.Direction.DESC) Pageable pageable) {
 
         if (codCliente != null) {
-            return ResponseEntity.ok(notaService.listarPorCliente(codCliente));
+            return ResponseEntity.ok(notaService.listarPorCliente(codCliente, pageable));
         }
         if (codCidade != null) {
-            return ResponseEntity.ok(notaService.listarPorCidade(codCidade));
+            return ResponseEntity.ok(notaService.listarPorCidade(codCidade, pageable));
         }
-        return ResponseEntity.ok(notaService.listar());
+        return ResponseEntity.ok(notaService.listar(pageable, search));
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> getStats() {
+        return ResponseEntity.ok(notaService.getEstatisticas());
     }
 
     @DeleteMapping("/{id}")

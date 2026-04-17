@@ -22,14 +22,17 @@ const fmtDate = (d) =>
 export default function Notas() {
   const toast = useToast()
 
-  const [notas,    setNotas]    = useState([])
+  const [notas, setNotas] = useState([])
   const [clientes, setClientes] = useState([])
-  const [cidades,  setCidades]  = useState([])
-  const [loading,  setLoading]  = useState(true)
+  const [cidades, setCidades] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const [search,       setSearch]      = useState('')
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalElements, setTotalElements] = useState(0)
   const [filterCliente, setFilterCliente] = useState('')
-  const [filterCidade,  setFilterCidade]  = useState('')
+  const [filterCidade, setFilterCidade] = useState('')
 
   const [modal,   setModal]   = useState(false)
   const [detail,  setDetail]  = useState(null)   // nota selecionada para detalhe
@@ -45,14 +48,25 @@ export default function Notas() {
   async function load(params = {}) {
     setLoading(true)
     try {
-      const [n, cl, ci] = await Promise.all([
-        getNotas(params),
-        getClientes(),
-        getCidades(),
-      ])
-      setNotas(n)
-      setClientes(cl)
-      setCidades(ci)
+      const finalParams = {
+        page,
+        size: 15,
+        search: search || undefined,
+        codCliente: filterCliente || undefined,
+        codCidade: filterCidade || undefined,
+        ...params
+      }
+      
+      const n = await getNotas(finalParams)
+      setNotas(n.content || [])
+      setTotalPages(n.totalPages || 0)
+      setTotalElements(n.totalElements || 0)
+
+      if (clientes.length === 0) {
+        const [cl, ci] = await Promise.all([getClientes(), getCidades()])
+        setClientes(cl)
+        setCidades(ci)
+      }
     } catch (e) {
       toast.error('Erro ao carregar', e.message)
     } finally {
@@ -60,21 +74,21 @@ export default function Notas() {
     }
   }
 
-  useEffect(() => { load() }, [])
-
-  // Apply filters
+  // Load when page or filters change
   useEffect(() => {
-    const params = {}
-    if (filterCliente) params.codCliente = filterCliente
-    else if (filterCidade) params.codCidade = filterCidade
-    load(params)
-  }, [filterCliente, filterCidade])
+    load()
+  }, [page, filterCliente, filterCidade])
 
-  const filtered = notas.filter((n) =>
-    !search ||
-    String(n.codNota).includes(search) ||
-    n.cliente?.nome?.toLowerCase().includes(search.toLowerCase())
-  )
+  // Search with debounce
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPage(0) // Reset to first page on search
+      load({ page: 0 })
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [search])
+
+  const filtered = notas // O filtro agora é feito no servidor
 
   // ── form helpers ─────────────────────────────────────
   function addItem()    { setItens([...itens, { valorUnitario: '', quantidade: '' }]) }
@@ -206,7 +220,6 @@ export default function Notas() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="filter-row" style={{ marginBottom: 0 }}>
           <SearchBar
@@ -251,12 +264,11 @@ export default function Notas() {
           )}
 
           <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-            {filtered.length.toLocaleString('pt-BR')} nota{filtered.length !== 1 ? 's' : ''}
+            {totalElements.toLocaleString('pt-BR')} nota{totalElements !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
 
-      {/* Table */}
       <div className="card">
         {loading ? (
           <Loading text="Carregando notas..." />
@@ -305,14 +317,12 @@ export default function Notas() {
                     <td>
                       <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
                         <button
-                          id={`btn-detail-nota-${n.codNota}`}
                           className="btn btn-secondary btn-sm"
                           onClick={() => setDetail(n)}
                         >
                           👁 Detalhes
                         </button>
                         <button
-                          id={`btn-delete-nota-${n.codNota}`}
                           className="btn btn-danger btn-sm"
                           onClick={() => setConfirmId(n.codNota)}
                         >
@@ -326,19 +336,36 @@ export default function Notas() {
             </table>
           </div>
         )}
+
+        {!loading && totalPages > 1 && (
+          <div className="pagination">
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+            >
+              « Anterior
+            </button>
+            <span className="pagination-info">
+              Página <strong>{page + 1}</strong> de {totalPages}
+            </span>
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage(page + 1)}
+            >
+              Próxima »
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* ── CREATE MODAL ────────────────────────────────── */}
       <Modal open={modal} title="Nova Nota Fiscal" onClose={() => setModal(false)} size="lg">
         <div className="modal-body">
-          {/* Header Info */}
           <div className="form-grid">
             <div className="form-group">
-              <label className="form-label" htmlFor="nota-cliente">
-                Cliente <span className="required">*</span>
-              </label>
+              <label className="form-label">Cliente <span className="required">*</span></label>
               <select
-                id="nota-cliente"
                 className={`select${errors.codCliente ? ' error' : ''}`}
                 value={form.codCliente}
                 onChange={(e) => setForm({ ...form, codCliente: e.target.value })}
@@ -350,13 +377,9 @@ export default function Notas() {
               </select>
               {errors.codCliente && <span className="form-error">⚠ {errors.codCliente}</span>}
             </div>
-
             <div className="form-group">
-              <label className="form-label" htmlFor="nota-data">
-                Data de Emissão <span className="required">*</span>
-              </label>
+              <label className="form-label">Data de Emissão <span className="required">*</span></label>
               <input
-                id="nota-data"
                 className={`input${errors.dataEmissao ? ' error' : ''}`}
                 type="date"
                 value={form.dataEmissao}
@@ -367,16 +390,10 @@ export default function Notas() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="nota-valor">
-              Valor Total (R$) <span className="required">*</span>
-            </label>
+            <label className="form-label">Valor Total (R$) <span className="required">*</span></label>
             <input
-              id="nota-valor"
               className={`input${errors.valorTotal ? ' error' : ''}`}
-              type="number"
-              min="0.01"
-              step="0.01"
-              placeholder="0,00"
+              type="number" step="0.01"
               value={form.valorTotal}
               onChange={(e) => setForm({ ...form, valorTotal: e.target.value })}
             />
@@ -384,247 +401,100 @@ export default function Notas() {
           </div>
 
           <hr className="divider" />
-
-          {/* ITENS */}
-          <div>
-            <div className="section-label">Itens da Nota</div>
-            {errors.sumItens && (
-              <div className="form-error" style={{ marginBottom: 8 }}>⚠ {errors.sumItens}</div>
-            )}
-            <div className="item-list">
-              {itens.map((it, i) => (
-                <div key={i} className="item-row">
-                  <div className="item-row-header">
-                    <span className="item-row-label">Item {i + 1}</span>
-                    {itens.length > 1 && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        style={{ padding: '2px 8px' }}
-                        onClick={() => removeItem(i)}
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label className="form-label">Valor Unitário (R$)</label>
-                      <input
-                        className={`input${errors[`item_val_${i}`] ? ' error' : ''}`}
-                        type="number" min="0.01" step="0.01" placeholder="0,00"
-                        value={it.valorUnitario}
-                        onChange={(e) => setItem(i, 'valorUnitario', e.target.value)}
-                      />
-                      {errors[`item_val_${i}`] && (
-                        <span className="form-error">⚠ {errors[`item_val_${i}`]}</span>
-                      )}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Quantidade</label>
-                      <input
-                        className={`input${errors[`item_qty_${i}`] ? ' error' : ''}`}
-                        type="number" min="1" step="1" placeholder="1"
-                        value={it.quantidade}
-                        onChange={(e) => setItem(i, 'quantidade', e.target.value)}
-                      />
-                      {errors[`item_qty_${i}`] && (
-                        <span className="form-error">⚠ {errors[`item_qty_${i}`]}</span>
-                      )}
-                    </div>
-                  </div>
-                  {it.valorUnitario && it.quantidade && (
-                    <div style={{ fontSize: '0.78rem', color: 'var(--brand-light)', fontFamily: 'var(--font-mono)' }}>
-                      Subtotal: {fmt(Number(it.valorUnitario) * Number(it.quantidade))}
-                    </div>
-                  )}
+          <div className="section-label">Itens da Nota</div>
+          <div className="item-list">
+            {itens.map((it, i) => (
+              <div key={i} className="item-row">
+                <div className="item-row-header">
+                  <span className="item-row-label">Item {i + 1}</span>
+                  {itens.length > 1 && <button className="btn btn-danger btn-sm" onClick={() => removeItem(i)}>✕</button>}
                 </div>
-              ))}
-            </div>
-            <button className="add-item-btn" style={{ marginTop: 8 }} onClick={addItem}>
-              + Adicionar item
-            </button>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Valor Unitário</label>
+                    <input className="input" type="number" step="0.01" value={it.valorUnitario} onChange={(e) => setItem(i, 'valorUnitario', e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Quantidade</label>
+                    <input className="input" type="number" value={it.quantidade} onChange={(e) => setItem(i, 'quantidade', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
+          <button className="add-item-btn" onClick={addItem}>+ Adicionar item</button>
 
           <hr className="divider" />
-
-          {/* PARCELAS */}
-          <div>
-            <div className="section-label">Parcelas de Pagamento</div>
-            {errors.sumParcs && (
-              <div className="form-error" style={{ marginBottom: 8 }}>⚠ {errors.sumParcs}</div>
-            )}
-            <div className="item-list">
-              {parcs.map((p, i) => (
-                <div key={i} className="item-row">
-                  <div className="item-row-header">
-                    <span className="item-row-label">Parcela {i + 1}</span>
-                    {parcs.length > 1 && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        style={{ padding: '2px 8px' }}
-                        onClick={() => removeParc(i)}
-                      >
-                        ✕
-                      </button>
-                    )}
+          <div className="section-label">Parcelas</div>
+          <div className="item-list">
+            {parcs.map((p, i) => (
+              <div key={i} className="item-row">
+                <div className="item-row-header">
+                  <span className="item-row-label">Parcela {i + 1}</span>
+                  {parcs.length > 1 && <button className="btn btn-danger btn-sm" onClick={() => removeParc(i)}>✕</button>}
+                </div>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Valor</label>
+                    <input className="input" type="number" step="0.01" value={p.valorVencimento} onChange={(e) => setParc(i, 'valorVencimento', e.target.value)} />
                   </div>
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label className="form-label">Valor (R$)</label>
-                      <input
-                        className={`input${errors[`parc_val_${i}`] ? ' error' : ''}`}
-                        type="number" min="0.01" step="0.01" placeholder="0,00"
-                        value={p.valorVencimento}
-                        onChange={(e) => setParc(i, 'valorVencimento', e.target.value)}
-                      />
-                      {errors[`parc_val_${i}`] && (
-                        <span className="form-error">⚠ {errors[`parc_val_${i}`]}</span>
-                      )}
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Data de Vencimento</label>
-                      <input
-                        className={`input${errors[`parc_data_${i}`] ? ' error' : ''}`}
-                        type="date"
-                        value={p.dataVencimento}
-                        onChange={(e) => setParc(i, 'dataVencimento', e.target.value)}
-                      />
-                      {errors[`parc_data_${i}`] && (
-                        <span className="form-error">⚠ {errors[`parc_data_${i}`]}</span>
-                      )}
-                    </div>
+                  <div className="form-group">
+                    <label className="form-label">Vencimento</label>
+                    <input className="input" type="date" value={p.dataVencimento} onChange={(e) => setParc(i, 'dataVencimento', e.target.value)} />
                   </div>
                 </div>
-              ))}
-            </div>
-            <button className="add-item-btn" style={{ marginTop: 8 }} onClick={addParc}>
-              + Adicionar parcela
-            </button>
+              </div>
+            ))}
           </div>
+          <button className="add-item-btn" onClick={addParc}>+ Adicionar parcela</button>
         </div>
-
         <div className="modal-footer">
-          <button className="btn btn-secondary" onClick={() => setModal(false)} disabled={saving}>
-            Cancelar
-          </button>
-          <button
-            id="btn-save-nota"
-            className="btn btn-primary"
-            onClick={handleSave}
-            disabled={saving}
-          >
+          <button className="btn btn-secondary" onClick={() => setModal(false)}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
             {saving ? 'Emitindo...' : 'Emitir Nota Fiscal'}
           </button>
         </div>
       </Modal>
 
-      {/* ── DETAIL MODAL ────────────────────────────────── */}
-      <Modal
-        open={!!detail}
-        title={`Nota Fiscal #${detail?.codNota}`}
-        onClose={() => setDetail(null)}
-        size="lg"
-      >
+      <Modal open={!!detail} title={`Nota Fiscal #${detail?.codNota}`} onClose={() => setDetail(null)} size="lg">
         {detail && (
           <>
             <div className="modal-body">
-              {/* Info geral */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr',
-                gap: 16,
-                padding: '14px 16px',
-                background: 'var(--bg-input)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border)',
-              }}>
-                <InfoCell label="Cliente"   value={detail.cliente?.nome ?? '—'} />
-                <InfoCell label="Cidade"    value={`${detail.cliente?.cidade?.nome ?? '—'} · ${detail.cliente?.cidade?.uf ?? ''}`} />
-                <InfoCell label="Emissão"   value={fmtDate(detail.dataEmissao)} />
-                <InfoCell label="Valor Total" value={fmt(detail.valorTotal)} highlight />
-                <InfoCell label="Itens"     value={`${detail.itens?.length ?? 0} item(ns)`} />
-                <InfoCell label="Parcelas"  value={`${detail.parcelas?.length ?? 0} parcela(s)`} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, padding: 16, background: 'var(--bg-input)', borderRadius: 8 }}>
+                <InfoCell label="Cliente" value={detail.cliente?.nome} />
+                <InfoCell label="Emissão" value={fmtDate(detail.dataEmissao)} />
+                <InfoCell label="Total" value={fmt(detail.valorTotal)} highlight />
               </div>
-
-              {/* Itens */}
-              <div>
-                <div className="section-label">Itens</div>
-                <div className="table-wrapper">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Valor Unitário</th>
-                        <th>Quantidade</th>
-                        <th>Subtotal</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(detail.itens || []).map((it, i) => (
-                        <tr key={i}>
-                          <td>{i + 1}</td>
-                          <td>{fmt(it.valorUnitario)}</td>
-                          <td>{it.quantidade}</td>
-                          <td>
-                            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--brand-light)' }}>
-                              {fmt(it.valorUnitario * it.quantidade)}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <div className="section-label" style={{ marginTop: 20 }}>Itens</div>
+              <div className="table-wrapper">
+                <table>
+                  <thead><tr><th>#</th><th>Unitário</th><th>Qtd</th><th>Total</th></tr></thead>
+                  <tbody>
+                    {detail.itens?.map((it, i) => (
+                      <tr key={i}><td>{i+1}</td><td>{fmt(it.valorUnitario)}</td><td>{it.quantidade}</td><td>{fmt(it.valorUnitario * it.quantidade)}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-
-              {/* Parcelas */}
-              <div>
-                <div className="section-label">Parcelas</div>
-                <div className="table-wrapper">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Nº</th>
-                        <th>Vencimento</th>
-                        <th>Valor Venc.</th>
-                        <th>Recebimento</th>
-                        <th>Valor Receb.</th>
-                        <th>Status</th>
+              <div className="section-label" style={{ marginTop: 20 }}>Parcelas</div>
+              <div className="table-wrapper">
+                <table>
+                  <thead><tr><th>Nº</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {detail.parcelas?.map((p) => (
+                      <tr key={p.codParcNota}>
+                        <td>{p.numero}</td>
+                        <td>{fmtDate(p.dataVencimento)}</td>
+                        <td>{fmt(p.valorVencimento)}</td>
+                        <td>{p.valorRecebimento ? 'Pago' : 'Pendente'}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {(detail.parcelas || []).map((p) => (
-                        <tr key={p.codParcNota}>
-                          <td>{p.numero}</td>
-                          <td>{fmtDate(p.dataVencimento)}</td>
-                          <td><span style={{ fontFamily: 'var(--font-mono)' }}>{fmt(p.valorVencimento)}</span></td>
-                          <td>{p.dataRecebimento ? fmtDate(p.dataRecebimento) : '—'}</td>
-                          <td>
-                            <span style={{ fontFamily: 'var(--font-mono)', color: p.valorRecebimento ? 'var(--success)' : 'var(--text-muted)' }}>
-                              {p.valorRecebimento ? fmt(p.valorRecebimento) : '—'}
-                            </span>
-                          </td>
-                          <td>
-                            {p.valorRecebimento
-                              ? <span className="badge badge-green">✓ Pago</span>
-                              : <span className="badge badge-red">Pendente</span>}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setDetail(null)}>Fechar</button>
-              <button
-                className="btn btn-danger"
-                onClick={() => { setConfirmId(detail.codNota); setDetail(null) }}
-              >
-                🗑 Excluir Nota
-              </button>
             </div>
           </>
         )}
@@ -632,8 +502,8 @@ export default function Notas() {
 
       <ConfirmModal
         open={!!confirmId}
-        title="Confirmar exclusão"
-        message="A nota e todos os seus itens e parcelas serão removidos permanentemente."
+        title="Excluir Nota"
+        message="Deseja realmente excluir esta nota fiscal?"
         onConfirm={handleDelete}
         onCancel={() => setConfirmId(null)}
         loading={deleting}

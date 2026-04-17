@@ -17,6 +17,7 @@ export const deleteCliente  = (id)        => api.delete(`/clientes/${id}`)
 // ── NOTAS ─────────────────────────────────────────────
 export const getNotas       = (params)    => api.get('/notas', { params })
 export const getNota        = (id)        => api.get(`/notas/${id}`)
+export const getNotaStats   = ()          => api.get('/notas/stats')
 export const createNota     = (data)      => api.post('/notas', data)
 export const deleteNota     = (id)        => api.delete(`/notas/${id}`)
 
