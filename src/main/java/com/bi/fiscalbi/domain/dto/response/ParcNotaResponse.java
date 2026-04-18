@@ -11,10 +11,11 @@ public class ParcNotaResponse {
     private BigDecimal valorRecebimento;
     private LocalDate dataRecebimento;
 
-    public ParcNotaResponse() {}
+    public ParcNotaResponse() {
+    }
 
     public ParcNotaResponse(Long codParcNota, Integer numero, BigDecimal valorVencimento,
-                             LocalDate dataVencimento, BigDecimal valorRecebimento, LocalDate dataRecebimento) {
+            LocalDate dataVencimento, BigDecimal valorRecebimento, LocalDate dataRecebimento) {
         this.codParcNota = codParcNota;
         this.numero = numero;
         this.valorVencimento = valorVencimento;
@@ -23,21 +24,51 @@ public class ParcNotaResponse {
         this.dataRecebimento = dataRecebimento;
     }
 
-    public Long getCodParcNota() { return codParcNota; }
-    public void setCodParcNota(Long codParcNota) { this.codParcNota = codParcNota; }
+    public Long getCodParcNota() {
+        return codParcNota;
+    }
 
-    public Integer getNumero() { return numero; }
-    public void setNumero(Integer numero) { this.numero = numero; }
+    public void setCodParcNota(Long codParcNota) {
+        this.codParcNota = codParcNota;
+    }
 
-    public BigDecimal getValorVencimento() { return valorVencimento; }
-    public void setValorVencimento(BigDecimal valorVencimento) { this.valorVencimento = valorVencimento; }
+    public Integer getNumero() {
+        return numero;
+    }
 
-    public LocalDate getDataVencimento() { return dataVencimento; }
-    public void setDataVencimento(LocalDate dataVencimento) { this.dataVencimento = dataVencimento; }
+    public void setNumero(Integer numero) {
+        this.numero = numero;
+    }
 
-    public BigDecimal getValorRecebimento() { return valorRecebimento; }
-    public void setValorRecebimento(BigDecimal valorRecebimento) { this.valorRecebimento = valorRecebimento; }
+    public BigDecimal getValorVencimento() {
+        return valorVencimento;
+    }
 
-    public LocalDate getDataRecebimento() { return dataRecebimento; }
-    public void setDataRecebimento(LocalDate dataRecebimento) { this.dataRecebimento = dataRecebimento; }
+    public void setValorVencimento(BigDecimal valorVencimento) {
+        this.valorVencimento = valorVencimento;
+    }
+
+    public LocalDate getDataVencimento() {
+        return dataVencimento;
+    }
+
+    public void setDataVencimento(LocalDate dataVencimento) {
+        this.dataVencimento = dataVencimento;
+    }
+
+    public BigDecimal getValorRecebimento() {
+        return valorRecebimento;
+    }
+
+    public void setValorRecebimento(BigDecimal valorRecebimento) {
+        this.valorRecebimento = valorRecebimento;
+    }
+
+    public LocalDate getDataRecebimento() {
+        return dataRecebimento;
+    }
+
+    public void setDataRecebimento(LocalDate dataRecebimento) {
+        this.dataRecebimento = dataRecebimento;
+    }
 }

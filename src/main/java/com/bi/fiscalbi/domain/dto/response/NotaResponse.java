@@ -12,10 +12,11 @@ public class NotaResponse {
     private List<ItemNotaResponse> itens;
     private List<ParcNotaResponse> parcelas;
 
-    public NotaResponse() {}
+    public NotaResponse() {
+    }
 
     public NotaResponse(Long codNota, ClienteResponse cliente, LocalDate dataEmissao,
-                         BigDecimal valorTotal, List<ItemNotaResponse> itens, List<ParcNotaResponse> parcelas) {
+            BigDecimal valorTotal, List<ItemNotaResponse> itens, List<ParcNotaResponse> parcelas) {
         this.codNota = codNota;
         this.cliente = cliente;
         this.dataEmissao = dataEmissao;
@@ -24,21 +25,51 @@ public class NotaResponse {
         this.parcelas = parcelas;
     }
 
-    public Long getCodNota() { return codNota; }
-    public void setCodNota(Long codNota) { this.codNota = codNota; }
+    public Long getCodNota() {
+        return codNota;
+    }
 
-    public ClienteResponse getCliente() { return cliente; }
-    public void setCliente(ClienteResponse cliente) { this.cliente = cliente; }
+    public void setCodNota(Long codNota) {
+        this.codNota = codNota;
+    }
 
-    public LocalDate getDataEmissao() { return dataEmissao; }
-    public void setDataEmissao(LocalDate dataEmissao) { this.dataEmissao = dataEmissao; }
+    public ClienteResponse getCliente() {
+        return cliente;
+    }
 
-    public BigDecimal getValorTotal() { return valorTotal; }
-    public void setValorTotal(BigDecimal valorTotal) { this.valorTotal = valorTotal; }
+    public void setCliente(ClienteResponse cliente) {
+        this.cliente = cliente;
+    }
 
-    public List<ItemNotaResponse> getItens() { return itens; }
-    public void setItens(List<ItemNotaResponse> itens) { this.itens = itens; }
+    public LocalDate getDataEmissao() {
+        return dataEmissao;
+    }
 
-    public List<ParcNotaResponse> getParcelas() { return parcelas; }
-    public void setParcelas(List<ParcNotaResponse> parcelas) { this.parcelas = parcelas; }
+    public void setDataEmissao(LocalDate dataEmissao) {
+        this.dataEmissao = dataEmissao;
+    }
+
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(BigDecimal valorTotal) {
+        this.valorTotal = valorTotal;
+    }
+
+    public List<ItemNotaResponse> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<ItemNotaResponse> itens) {
+        this.itens = itens;
+    }
+
+    public List<ParcNotaResponse> getParcelas() {
+        return parcelas;
+    }
+
+    public void setParcelas(List<ParcNotaResponse> parcelas) {
+        this.parcelas = parcelas;
+    }
 }

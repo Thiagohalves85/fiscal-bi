@@ -60,4 +60,3 @@ public class NotaController {
         return ResponseEntity.noContent().build();
     }
 }
-

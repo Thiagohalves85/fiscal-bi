@@ -5,7 +5,8 @@ public class ClienteResponse {
     private String nome;
     private CidadeResponse cidade;
 
-    public ClienteResponse() {}
+    public ClienteResponse() {
+    }
 
     public ClienteResponse(Long codCliente, String nome, CidadeResponse cidade) {
         this.codCliente = codCliente;
@@ -13,12 +14,27 @@ public class ClienteResponse {
         this.cidade = cidade;
     }
 
-    public Long getCodCliente() { return codCliente; }
-    public void setCodCliente(Long codCliente) { this.codCliente = codCliente; }
+    public Long getCodCliente() {
+        return codCliente;
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public void setCodCliente(Long codCliente) {
+        this.codCliente = codCliente;
+    }
 
-    public CidadeResponse getCidade() { return cidade; }
-    public void setCidade(CidadeResponse cidade) { this.cidade = cidade; }
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public CidadeResponse getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(CidadeResponse cidade) {
+        this.cidade = cidade;
+    }
 }

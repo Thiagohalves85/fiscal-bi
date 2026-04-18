@@ -5,7 +5,8 @@ public class CidadeResponse {
     private String nome;
     private String uf;
 
-    public CidadeResponse() {}
+    public CidadeResponse() {
+    }
 
     public CidadeResponse(Long codCidade, String nome, String uf) {
         this.codCidade = codCidade;
@@ -13,12 +14,27 @@ public class CidadeResponse {
         this.uf = uf;
     }
 
-    public Long getCodCidade() { return codCidade; }
-    public void setCodCidade(Long codCidade) { this.codCidade = codCidade; }
+    public Long getCodCidade() {
+        return codCidade;
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public void setCodCidade(Long codCidade) {
+        this.codCidade = codCidade;
+    }
 
-    public String getUf() { return uf; }
-    public void setUf(String uf) { this.uf = uf; }
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
+    }
 }

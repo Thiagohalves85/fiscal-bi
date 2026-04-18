@@ -11,11 +11,22 @@ public class ClienteRequest {
     @NotNull(message = "A cidade do cliente é obrigatória")
     private Long codCidade;
 
-    public ClienteRequest() {}
+    public ClienteRequest() {
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() {
+        return nome;
+    }
 
-    public Long getCodCidade() { return codCidade; }
-    public void setCodCidade(Long codCidade) { this.codCidade = codCidade; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public Long getCodCidade() {
+        return codCidade;
+    }
+
+    public void setCodCidade(Long codCidade) {
+        this.codCidade = codCidade;
+    }
 }

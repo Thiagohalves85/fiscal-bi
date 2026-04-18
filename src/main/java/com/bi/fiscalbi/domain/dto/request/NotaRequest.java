@@ -29,20 +29,46 @@ public class NotaRequest {
     @Valid
     private List<ParcNotaRequest> parcelas;
 
-    public NotaRequest() {}
+    public NotaRequest() {
+    }
 
-    public Long getCodCliente() { return codCliente; }
-    public void setCodCliente(Long codCliente) { this.codCliente = codCliente; }
+    public Long getCodCliente() {
+        return codCliente;
+    }
 
-    public LocalDate getDataEmissao() { return dataEmissao; }
-    public void setDataEmissao(LocalDate dataEmissao) { this.dataEmissao = dataEmissao; }
+    public void setCodCliente(Long codCliente) {
+        this.codCliente = codCliente;
+    }
 
-    public BigDecimal getValorTotal() { return valorTotal; }
-    public void setValorTotal(BigDecimal valorTotal) { this.valorTotal = valorTotal; }
+    public LocalDate getDataEmissao() {
+        return dataEmissao;
+    }
 
-    public List<ItemNotaRequest> getItens() { return itens; }
-    public void setItens(List<ItemNotaRequest> itens) { this.itens = itens; }
+    public void setDataEmissao(LocalDate dataEmissao) {
+        this.dataEmissao = dataEmissao;
+    }
 
-    public List<ParcNotaRequest> getParcelas() { return parcelas; }
-    public void setParcelas(List<ParcNotaRequest> parcelas) { this.parcelas = parcelas; }
+    public BigDecimal getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(BigDecimal valorTotal) {
+        this.valorTotal = valorTotal;
+    }
+
+    public List<ItemNotaRequest> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<ItemNotaRequest> itens) {
+        this.itens = itens;
+    }
+
+    public List<ParcNotaRequest> getParcelas() {
+        return parcelas;
+    }
+
+    public void setParcelas(List<ParcNotaRequest> parcelas) {
+        this.parcelas = parcelas;
+    }
 }

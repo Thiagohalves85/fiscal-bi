@@ -19,7 +19,6 @@ public class CidadeMapper {
         return new CidadeResponse(
                 cidade.getCodCidade(),
                 cidade.getNome(),
-                cidade.getUf()
-        );
+                cidade.getUf());
     }
 }

@@ -7,7 +7,8 @@ public class ItemNotaResponse {
     private BigDecimal valorUnitario;
     private Integer quantidade;
 
-    public ItemNotaResponse() {}
+    public ItemNotaResponse() {
+    }
 
     public ItemNotaResponse(Long codItemNota, BigDecimal valorUnitario, Integer quantidade) {
         this.codItemNota = codItemNota;
@@ -15,12 +16,27 @@ public class ItemNotaResponse {
         this.quantidade = quantidade;
     }
 
-    public Long getCodItemNota() { return codItemNota; }
-    public void setCodItemNota(Long codItemNota) { this.codItemNota = codItemNota; }
+    public Long getCodItemNota() {
+        return codItemNota;
+    }
 
-    public BigDecimal getValorUnitario() { return valorUnitario; }
-    public void setValorUnitario(BigDecimal valorUnitario) { this.valorUnitario = valorUnitario; }
+    public void setCodItemNota(Long codItemNota) {
+        this.codItemNota = codItemNota;
+    }
 
-    public Integer getQuantidade() { return quantidade; }
-    public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
+    public BigDecimal getValorUnitario() {
+        return valorUnitario;
+    }
+
+    public void setValorUnitario(BigDecimal valorUnitario) {
+        this.valorUnitario = valorUnitario;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
+    }
 }

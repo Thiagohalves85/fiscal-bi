@@ -20,14 +20,30 @@ public class ParcNotaRequest {
     @NotNull(message = "A data de vencimento é obrigatória")
     private LocalDate dataVencimento;
 
-    public ParcNotaRequest() {}
+    public ParcNotaRequest() {
+    }
 
-    public Integer getNumero() { return numero; }
-    public void setNumero(Integer numero) { this.numero = numero; }
+    public Integer getNumero() {
+        return numero;
+    }
 
-    public BigDecimal getValorVencimento() { return valorVencimento; }
-    public void setValorVencimento(BigDecimal valorVencimento) { this.valorVencimento = valorVencimento; }
+    public void setNumero(Integer numero) {
+        this.numero = numero;
+    }
 
-    public LocalDate getDataVencimento() { return dataVencimento; }
-    public void setDataVencimento(LocalDate dataVencimento) { this.dataVencimento = dataVencimento; }
+    public BigDecimal getValorVencimento() {
+        return valorVencimento;
+    }
+
+    public void setValorVencimento(BigDecimal valorVencimento) {
+        this.valorVencimento = valorVencimento;
+    }
+
+    public LocalDate getDataVencimento() {
+        return dataVencimento;
+    }
+
+    public void setDataVencimento(LocalDate dataVencimento) {
+        this.dataVencimento = dataVencimento;
+    }
 }

@@ -16,11 +16,22 @@ public class ItemNotaRequest {
     @Min(value = 1, message = "A quantidade deve ser maior ou igual a 1")
     private Integer quantidade;
 
-    public ItemNotaRequest() {}
+    public ItemNotaRequest() {
+    }
 
-    public BigDecimal getValorUnitario() { return valorUnitario; }
-    public void setValorUnitario(BigDecimal valorUnitario) { this.valorUnitario = valorUnitario; }
+    public BigDecimal getValorUnitario() {
+        return valorUnitario;
+    }
 
-    public Integer getQuantidade() { return quantidade; }
-    public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
+    public void setValorUnitario(BigDecimal valorUnitario) {
+        this.valorUnitario = valorUnitario;
+    }
+
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
+    }
 }

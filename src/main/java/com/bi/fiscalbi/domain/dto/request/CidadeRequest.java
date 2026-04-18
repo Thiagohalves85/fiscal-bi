@@ -12,11 +12,22 @@ public class CidadeRequest {
     @Size(min = 2, max = 2, message = "A UF deve ter exatamente 2 caracteres")
     private String uf;
 
-    public CidadeRequest() {}
+    public CidadeRequest() {
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() {
+        return nome;
+    }
 
-    public String getUf() { return uf; }
-    public void setUf(String uf) { this.uf = uf; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
+    }
 }

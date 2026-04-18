@@ -22,7 +22,8 @@ public class ClienteMapper {
         Cliente cliente = new Cliente();
         cliente.setNome(request.getNome());
         cliente.setCidade(cidadeRepository.findById(request.getCodCidade())
-                .orElseThrow(() -> new ResourceNotFoundException("Cidade não encontrada com id: " + request.getCodCidade())));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cidade não encontrada com id: " + request.getCodCidade())));
         return cliente;
     }
 
@@ -30,7 +31,6 @@ public class ClienteMapper {
         return new ClienteResponse(
                 cliente.getCodCliente(),
                 cliente.getNome(),
-                cidadeMapper.toResponse(cliente.getCidade())
-        );
+                cidadeMapper.toResponse(cliente.getCidade()));
     }
 }
