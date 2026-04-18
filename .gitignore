@@ -95,7 +95,6 @@ docker-data/
 # 🐘 POSTGRESQL
 ############################################
 # Dumps
-*.sql
 *.dump
 
 # Data folder (caso use volume local)
