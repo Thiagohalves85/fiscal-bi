@@ -12,6 +12,7 @@ const NAV = [
     items: [
       { to: '/cidades',  icon: '🏙', label: 'Cidades'   },
       { to: '/clientes', icon: '🏢', label: 'Clientes'  },
+      { to: '/pessoas',  icon: '👤', label: 'Pessoas'   },
     ],
   },
   {

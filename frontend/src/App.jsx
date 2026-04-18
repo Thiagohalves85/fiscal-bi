@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Cidades   from './pages/Cidades'
 import Clientes  from './pages/Clientes'
 import Notas     from './pages/Notas'
+import Pessoas   from './pages/Pessoas'
 import Gerador   from './pages/Gerador'
 
 function Layout() {
@@ -23,6 +24,7 @@ function Layout() {
           <Route path="/"          element={<Dashboard />} />
           <Route path="/cidades"   element={<Cidades />}   />
           <Route path="/clientes"  element={<Clientes />}  />
+          <Route path="/pessoas"   element={<Pessoas />}   />
           <Route path="/notas"     element={<Notas />}     />
           <Route path="/gerador"   element={<Gerador />}   />
           <Route path="*"          element={<NotFound />}  />

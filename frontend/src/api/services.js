@@ -21,5 +21,12 @@ export const getNotaStats   = ()          => api.get('/notas/stats')
 export const createNota     = (data)      => api.post('/notas', data)
 export const deleteNota     = (id)        => api.delete(`/notas/${id}`)
 
+// ── PESSOAS ──────────────────────────────────────────
+export const getPessoas     = ()          => api.get('/pessoas')
+export const getPessoa      = (id)        => api.get(`/pessoas/${id}`)
+export const createPessoa   = (data)      => api.post('/pessoas', data)
+export const updatePessoa   = (id, data)  => api.put(`/pessoas/${id}`, data)
+export const deletePessoa   = (id)        => api.delete(`/pessoas/${id}`)
+
 // ── GENERATOR ─────────────────────────────────────────
 export const gerarNotas     = (params)    => api.post('/generator', null, { params })
